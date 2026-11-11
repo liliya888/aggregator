@@ -1,0 +1,26 @@
+name: Regroup by country
+
+# 把 Gist 里 aggregator 生成的 clash.yaml 按国家重排，
+# 生成带国家分组的 clash-by-country.yaml，回写到同一个 Gist。
+# Refresh 每 2 小时跑一次（整点），这里错开半小时跑。
+on:
+  schedule:
+    - cron: "30 */2 * * *"
+  workflow_dispatch:
+
+jobs:
+  regroup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Regroup and update Gist
+        env:
+          GIST_PAT: ${{ secrets.GIST_PAT }}
+        run: python tools/regroup_by_country.py
